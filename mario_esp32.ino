@@ -133,28 +133,52 @@ const uint8_t goombaSpr[12][16] = {
 };
 
 /* ---------------------------------------------------------------------
-   6) SPRITE DO KOOPA andando (16x15, ampliado 2x -> 32x30)
+   6) SPRITE DO KOOPA andando (16x16, ampliado 2x -> 32x32)
         0=transp 1=casco verde 2=pele amarela 3=escuro 4=branco 5=verde escuro
+      Cabeca com olho branco + pupila; casco com "gomos"; pes andando.
    --------------------------------------------------------------------- */
 const uint16_t koopaPal[6] = { 0, C_GREEN, C_KSKIN, C_DARK, C_WHITE, C_DGREEN };
 
-const uint8_t koopaSpr[15][16] = {
-  {0,0,0,2,2,2,0,0,0,0,0,0,0,0,0,0},
-  {0,0,2,2,2,2,2,0,0,0,0,0,0,0,0,0},
-  {0,0,2,3,2,2,2,0,0,0,0,0,0,0,0,0},
-  {0,0,2,2,2,2,0,0,0,0,0,0,0,0,0,0},
-  {0,0,0,2,2,0,0,1,1,1,1,1,0,0,0,0},
-  {0,0,0,2,2,1,1,1,1,1,1,1,1,1,0,0},
-  {0,0,2,2,1,1,5,1,1,5,1,1,1,1,0,0},
-  {0,0,2,2,1,1,1,1,1,1,1,1,1,1,1,0},
-  {0,0,0,2,1,5,1,1,5,1,1,5,1,1,1,0},
-  {0,0,0,2,1,1,1,1,1,1,1,1,1,1,1,0},
+const uint8_t koopaSpr[16][16] = {
+  {0,0,2,2,2,0,0,0,0,0,0,0,0,0,0,0},
+  {0,2,2,2,2,2,0,0,0,0,0,0,0,0,0,0},
+  {2,2,4,3,2,2,0,0,0,0,0,0,0,0,0,0},
+  {2,2,4,3,2,2,0,0,0,0,0,0,0,0,0,0},
+  {2,2,2,2,2,2,0,0,0,0,0,0,0,0,0,0},
+  {0,2,2,2,2,0,1,1,1,1,1,0,0,0,0,0},
+  {0,0,2,2,1,1,1,1,1,1,1,1,1,0,0,0},
+  {0,0,2,2,1,1,5,1,1,1,5,1,1,1,0,0},
+  {0,0,2,2,1,5,1,1,5,1,1,5,1,1,1,0},
+  {0,0,0,2,1,1,1,5,1,1,5,1,1,1,1,0},
+  {0,0,0,2,1,5,1,1,1,5,1,1,5,1,1,0},
   {0,0,0,2,2,1,1,1,1,1,1,1,1,1,0,0},
   {0,0,0,0,2,4,4,4,4,4,4,4,4,0,0,0},
-  {0,0,0,0,2,2,0,0,0,0,0,2,2,0,0,0},
+  {0,0,0,0,2,2,2,0,0,0,2,2,2,0,0,0},
   {0,0,0,2,2,2,0,0,0,0,0,2,2,2,0,0},
-  {0,0,2,2,2,0,0,0,0,0,0,0,2,2,2,0},
+  {0,0,2,2,2,2,0,0,0,0,2,2,2,2,0,0},
 };
+
+/* ---------------------------------------------------------------------
+   6b) SPRITE DO COGUMELO (12x11, ampliado 2x -> 24x22)
+        0=transp 1=vermelho 2=branco (bolinhas) 3=pele 4=escuro (olhos)
+   --------------------------------------------------------------------- */
+const uint16_t shroomPal[5] = { 0, C_MRED, C_WHITE, C_SKIN, C_DARK };
+
+const uint8_t shroomSpr[11][12] = {
+  {0,0,0,0,1,1,1,1,0,0,0,0},
+  {0,0,1,1,2,2,2,2,1,1,0,0},
+  {0,1,1,2,2,2,2,2,2,1,1,0},
+  {0,1,1,2,2,2,2,2,2,1,1,0},
+  {1,2,1,1,1,1,1,1,1,1,2,1},
+  {1,2,2,1,1,1,1,1,1,2,2,1},
+  {1,1,1,1,1,1,1,1,1,1,1,1},
+  {0,0,3,3,3,3,3,3,3,3,0,0},
+  {0,0,3,4,3,3,3,3,4,3,0,0},
+  {0,0,3,4,3,3,3,3,4,3,0,0},
+  {0,0,3,3,3,3,3,3,3,3,0,0},
+};
+
+const int SHR_W = 24, SHR_H = 22;   // tamanho do cogumelo na tela
 
 /* ---------------------------------------------------------------------
    7) OBJETOS DE TELA
@@ -176,7 +200,7 @@ const int MARIO_W   = 32;
 const int MARIO_H   = 32;
 const int PIPE_W    = 26;
 const int GO_W      = 32, GO_H = 24;    // goomba
-const int KO_W      = 32, KO_H = 30;    // koopa andando
+const int KO_W      = 32, KO_H = 32;    // koopa andando
 const int SH_W      = 24, SH_H = 16;    // casco
 const int QB_SIZE   = 24;               // bloco "?"
 const int QB_Y      = GROUND_Y - 94;    // topo do bloco (bater com a cabeca)
@@ -429,8 +453,9 @@ void updateWorld() {
     int pL = (int)pipes[i].x + 3;
     int pR = (int)pipes[i].x + PIPE_W - 3;
     int pT = GROUND_Y - pipes[i].h;
-    if (mR > pL && mL < pR && mB > pT) {
+    if (mR > pL && mL < pR && mB >= pT) {
       // caindo e perto do topo? POUSA no cano (plataforma, como no SMW)
+      // (>= gruda o Mario no topo, sem micro-quique de gravidade)
       if (marioVel >= 0 && (mB - pT) <= 14) {
         marioY   = pT - MARIO_H;
         marioVel = 0;
@@ -587,7 +612,7 @@ void updateWorld() {
     if (shroom.x < -25) shroom.active = false;
     else {
       int sy = (int)(shroom.baseY + sinf(frameTick * 0.15f) * 3.0f);
-      if (mR > shroom.x && mL < shroom.x + 20 && mB > sy && mT < sy + 20) {
+      if (mR > shroom.x && mL < shroom.x + SHR_W && mB > sy && mT < sy + SHR_H) {
         shroom.active = false;
         superMario = true;
         score += 10;
@@ -654,10 +679,14 @@ void drawGoomba(int x, bool squashed) {
 
 void drawKoopaWalk(int x) {
   int y = GROUND_Y - KO_H;
-  for (int r = 0; r < 15; r++)
+  int fo = ((frameTick / 4) % 2) * 2;   // pezinhos alternando (anda!)
+  for (int r = 0; r < 16; r++)
     for (int c = 0; c < 16; c++) {
       uint8_t idx = koopaSpr[r][c];
-      if (idx) gfx->fillRect(x + c * 2, y + r * 2, 2, 2, koopaPal[idx]);
+      if (idx) {
+        int xo = (r >= 13) ? fo : 0;    // so os pes se deslocam
+        gfx->fillRect(x + c * 2 + xo, y + r * 2, 2, 2, koopaPal[idx]);
+      }
     }
 }
 
@@ -688,13 +717,11 @@ void drawCoin(int cx, int cy) {
 }
 
 void drawShroom(int x, int y) {
-  gfx->fillRoundRect(x, y, 20, 12, 5, C_MRED);
-  gfx->fillCircle(x + 5,  y + 5, 2, C_WHITE);
-  gfx->fillCircle(x + 14, y + 4, 2, C_WHITE);
-  gfx->fillCircle(x + 10, y + 9, 2, C_WHITE);
-  gfx->fillRect(x + 5, y + 12, 10, 8, C_SKIN);
-  gfx->fillRect(x + 7, y + 14, 2, 3, C_DARK);
-  gfx->fillRect(x + 11, y + 14, 2, 3, C_DARK);
+  for (int r = 0; r < 11; r++)
+    for (int c = 0; c < 12; c++) {
+      uint8_t idx = shroomSpr[r][c];
+      if (idx) gfx->fillRect(x + c * 2, y + r * 2, 2, 2, shroomPal[idx]);
+    }
 }
 
 void drawQBlock(int x, bool used, int bump, int coinPop) {
@@ -845,7 +872,9 @@ void loop() {
       marioVel = 0;
       onGround = true;
     }
-    if (onGround && (frameTick % 4 == 0)) runFrame ^= 1;
+    // perninhas acompanham a velocidade do jogo (mais rapido = mais passos)
+    int legPeriod = (worldSpeed >= 5.0f) ? 2 : 3;
+    if (onGround && (frameTick % legPeriod == 0)) runFrame ^= 1;
     if (invTimer > 0) invTimer--;
 
     updateWorld();
