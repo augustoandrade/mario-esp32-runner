@@ -1104,24 +1104,35 @@ void drawHUD() {
   int th = themeNow();
   uint16_t txt = (th == 1) ? C_DARK : C_WHITE;
 
-  gfx->fillEllipse(84, 31, 5, 7, C_YELLOW);
-  gfx->drawEllipse(84, 31, 5, 7, C_COINDK);
+  // coracoes: topo da tela, centralizados no arco
+  int hw = lives * 15 - 3;              // largura total da fileira
+  int hx = 120 - hw / 2;
+  for (int i = 0; i < lives; i++)
+    drawHeart(hx + i * 15, 12);
+
+  // moedas: icone + numero centralizados como um bloco unico
+  char cbuf[8];
+  snprintf(cbuf, sizeof(cbuf), "x%d", coinCount);
+  int tw = strlen(cbuf) * 12;           // largura do texto (size 2)
+  int x0 = 120 - (18 + tw) / 2;         // 18 = icone + respiro
+  gfx->fillEllipse(x0 + 6, 38, 5, 7, C_YELLOW);
+  gfx->drawEllipse(x0 + 6, 38, 5, 7, C_COINDK);
   gfx->setTextColor(txt);
   gfx->setTextSize(2);
-  gfx->setCursor(94, 24);
-  gfx->print("x");
-  gfx->print(coinCount);
-  gfx->setTextSize(1);
-  gfx->setCursor(96, 44);
-  gfx->print(score);
+  gfx->setCursor(x0 + 18, 31);
+  gfx->print(cbuf);
 
-  // coracoes (vidas)
-  int hx = 120 - lives * 7;
-  for (int i = 0; i < lives; i++)
-    drawHeart(hx + i * 15, 54);
+  // pontos: centralizados na faixa do chao (area que ficava vazia)
+  char sbuf[12];
+  snprintf(sbuf, sizeof(sbuf), "%d", score);
+  gfx->setTextSize(1);
+  gfx->setTextColor(C_WHITE);
+  gfx->setCursor(120 - (int)strlen(sbuf) * 3, 214);
+  gfx->print(sbuf);
 
   if (bannerTimer > 0) {
     int len = strlen(bannerText);
+    gfx->setTextColor(txt);
     gfx->setTextSize(2);
     gfx->setCursor(120 - len * 6, 74);
     gfx->print(bannerText);
