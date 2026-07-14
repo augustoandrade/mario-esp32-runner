@@ -1,0 +1,14 @@
+# Arduino IDE — arquivos de build/temporarios
+build/
+*.bin
+*.elf
+*.hex
+*.map
+.build/
+
+# macOS
+.DS_Store
+
+# Arduino IDE 2.x
+.theia/
+sketch.json
