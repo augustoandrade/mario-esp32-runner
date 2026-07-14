@@ -63,6 +63,9 @@ const long TZ_OFFSET = -3 * 3600;   // fuso de Brasilia
 #define TOUCH_SCL 5
 #define TOUCH_ADDR 0x15
 
+// botao alternativo de pulo: BOOT na placa real / pushbutton no Wokwi
+#define BTN_JUMP  9
+
 /* ---------------------------------------------------------------------
    2) CORES (RGB565 — Arduino_GFX nao define RED/BLUE, definimos na mao)
    --------------------------------------------------------------------- */
@@ -323,6 +326,9 @@ uint32_t frameTick = 0;
    TOUCH — CST816 por polling
    ===================================================================== */
 bool isTouched() {
+  // botao fisico (BOOT na placa / botao virtual no simulador Wokwi)
+  if (digitalRead(BTN_JUMP) == LOW) return true;
+
   Wire.beginTransmission(TOUCH_ADDR);
   Wire.write(0x01);
   if (Wire.endTransmission(false) != 0) return false;
@@ -1133,6 +1139,8 @@ void setup() {
 
   pinMode(TFT_BL, OUTPUT);
   digitalWrite(TFT_BL, HIGH);
+
+  pinMode(BTN_JUMP, INPUT_PULLUP);   // botao BOOT / simulador
 
   gfx->begin();
   gfx->fillScreen(C_BLACK);
