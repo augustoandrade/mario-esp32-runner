@@ -36,9 +36,14 @@ Se o upload falhar: segure **BOOT** ao conectar o USB e tente de novo.
 - Toque em qualquer lugar da tela = **pular**
 - **Cano verde**: desvie pulando
 - **Goomba**: pule EM CIMA pra esmagar (+20 pts) ou desvie
+- **Koopa**: pise 1x → vira casco; encoste no casco → CHUTA! O casco
+  sai na frente destruindo inimigos (+20 cada). Casco some ao bater em cano.
+- **Bloco "?"**: bata POR BAIXO (pulando) → solta moeda ou cogumelo
 - **Moedas**: colete no pulo ou correndo (+5 pts cada)
 - **Cogumelo**: vira Super Mario com capa — aguenta 1 batida
   (perde a capa e pisca invencivel por um instante)
+- **Mundos**: a cada 150 pts o cenario muda — dia → por do sol → noite
+- **Recorde**: salvo na flash, sobrevive ao desligar a placa
 - A velocidade aumenta conforme voce vence obstaculos
 
 ## Detalhes tecnicos
@@ -55,7 +60,9 @@ Se o upload falhar: segure **BOOT** ao conectar o USB e tente de novo.
 - [x] Inimigo goomba (com pisao + esmagado)
 - [x] Power-up cogumelo -> capa (aguenta 1 hit)
 - [x] Parallax (nuvens/colinas/chao em velocidades diferentes)
-- [ ] Bloco "?" pra bater por baixo
+- [x] Bloco "?" pra bater por baixo (moeda ou cogumelo)
+- [x] Koopa com casco chutavel
+- [x] Recorde salvo na flash (Preferences)
+- [x] Mundos com temas (dia / por do sol / noite)
 - [ ] Som (se houver buzzer)
-- [ ] Recorde salvo na flash (Preferences)
 - [ ] Suporte a controle Bluetooth (BLE — ex.: Xbox firmware 5.15+)
