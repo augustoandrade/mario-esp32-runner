@@ -291,7 +291,7 @@ void resetGame() {
   worldSpeed    = 3.0f;
   passedCount   = 0;
   distSinceLast = 0;
-  nextGap       = 150;
+  nextGap       = 290;   // 1o obstaculo demora mais (tempo de se preparar)
   coinDist      = 0;
   coinGap       = 120;
 
@@ -325,7 +325,9 @@ void takeHit() {
 void spawnPipe() {
   for (int i = 0; i < MAX_PIPES; i++)
     if (!pipes[i].active) {
-      pipes[i] = { (float)(SCREEN_W + 10), (int)random(26, 50), true, false };
+      // aquecimento: os 2 primeiros canos vem baixinhos
+      int h = (passedCount < 2) ? random(26, 34) : random(26, 50);
+      pipes[i] = { (float)(SCREEN_W + 10), h, true, false };
       return;
     }
 }
