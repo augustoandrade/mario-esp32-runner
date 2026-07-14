@@ -93,7 +93,7 @@ struct Pipe   { float x; int h; bool active; bool scored; bool hasPlant; int pla
 struct Goomba { float x; bool active; bool scored; int squash; };
 struct Koopa  { float x; bool active; bool scored; int mode; };   // 0 anda, 1 casco, 2 casco chutado
 struct Coin   { float x; int y; bool active; };
-struct Item   { float x; float baseY; bool active; int kind; };   // 1 cogumelo, 2 estrela, 3 ovo yoshi
+struct Item   { float x; float y; float vy; bool active; int kind; };  // 1 cogumelo, 2 estrela, 3 ovo yoshi
 struct QBlock { float x; bool active; bool used; int bump; int coinPop; };
 struct Bullet { float x; int y; bool active; bool scored; };
 
@@ -492,10 +492,10 @@ void spawnQBlock() {
     }
 }
 
-bool spawnItem(int kind, float x, float baseY) {
+bool spawnItem(int kind, float x, float y, float vy) {
   for (int i = 0; i < MAX_ITEMS; i++)
     if (!items[i].active) {
-      items[i] = { x, baseY, true, kind };
+      items[i] = { x, y, vy, true, kind };
       return true;
     }
   return false;
@@ -527,7 +527,7 @@ void updateWorld() {
     else                                   spawnPipe();
 
     if (!superMario && starTimer == 0 && random(0, 100) < 8)
-      spawnItem(1, SCREEN_W + 70, GROUND_Y - 82);   // cogumelo avulso raro
+      spawnItem(1, SCREEN_W + 40, GROUND_Y - SHR_H, 0);  // cogumelo avulso deslizando no chao
 
     distSinceLast = 0;
     nextGap = random(115, 185);
@@ -740,11 +740,12 @@ void updateWorld() {
         marioVel = 0.5f;
 
         // premio: ovo do Yoshi > estrela > cogumelo > moeda
+        // o item PULA do bloco e cai no chao (como no SNES)
         int roll = random(0, 100);
         bool given = false;
-        if      (roll < 15 && !riding)          given = spawnItem(3, qblocks[i].x, QB_Y - 26);
-        else if (roll < 28 && starTimer == 0)   given = spawnItem(2, qblocks[i].x, QB_Y - 26);
-        else if (roll < 55 && !superMario)      given = spawnItem(1, qblocks[i].x, QB_Y - 24);
+        if      (roll < 15 && !riding)          given = spawnItem(3, qblocks[i].x, QB_Y - 24, -3.5f);
+        else if (roll < 28 && starTimer == 0)   given = spawnItem(2, qblocks[i].x, QB_Y - 24, -3.5f);
+        else if (roll < 55 && !superMario)      given = spawnItem(1, qblocks[i].x, QB_Y - 24, -3.5f);
         if (!given) {
           qblocks[i].coinPop = 12;
           coinCount++;
@@ -770,13 +771,24 @@ void updateWorld() {
     }
   }
 
-  // ---- itens (cogumelo / estrela / ovo yoshi) ----
+  // ---- itens (cogumelo / estrela / ovo yoshi) — fisica estilo SNES ----
   for (int i = 0; i < MAX_ITEMS; i++) {
     if (!items[i].active) continue;
-    items[i].x -= worldSpeed;
+
+    // cogumelo/ovo deslizam na direcao do Mario; estrela vem mais devagar
+    items[i].x -= worldSpeed + ((items[i].kind == 2) ? 0.3f : 0.6f);
+
+    // gravidade + chao
+    items[i].vy += 0.5f;
+    items[i].y  += items[i].vy;
+    if (items[i].y + SHR_H >= GROUND_Y) {
+      items[i].y = GROUND_Y - SHR_H;
+      items[i].vy = (items[i].kind == 2) ? -6.5f : 0;   // estrela QUICA!
+    }
+
     if (items[i].x < -30) { items[i].active = false; continue; }
 
-    int sy = (int)(items[i].baseY + sinf(frameTick * 0.15f) * 3.0f);
+    int sy = (int)items[i].y;
     if (mR > items[i].x && mL < items[i].x + SHR_W && mB > sy && mT < sy + SHR_H) {
       int kind = items[i].kind;
       items[i].active = false;
@@ -947,7 +959,7 @@ void drawEgg(int x, int y) {
 
 void drawItem(int i) {
   int x = (int)items[i].x;
-  int y = (int)(items[i].baseY + sinf(frameTick * 0.15f) * 3.0f);
+  int y = (int)items[i].y;
   if      (items[i].kind == 1) drawShroom(x, y);
   else if (items[i].kind == 2) drawStarItem(x, y);
   else                         drawEgg(x, y);
