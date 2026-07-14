@@ -429,7 +429,16 @@ void updateWorld() {
     int pL = (int)pipes[i].x + 3;
     int pR = (int)pipes[i].x + PIPE_W - 3;
     int pT = GROUND_Y - pipes[i].h;
-    if (mR > pL && mL < pR && mB > pT) takeHit();
+    if (mR > pL && mL < pR && mB > pT) {
+      // caindo e perto do topo? POUSA no cano (plataforma, como no SMW)
+      if (marioVel >= 0 && (mB - pT) <= 14) {
+        marioY   = pT - MARIO_H;
+        marioVel = 0;
+        onGround = true;    // da pra pular de cima do cano
+      } else {
+        takeHit();          // bateu de lado = dano
+      }
+    }
   }
 
   // ---- goombas ----
