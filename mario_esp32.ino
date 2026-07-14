@@ -285,6 +285,7 @@ bool  superMario;     // capa (cogumelo)
 bool  riding;         // montado no Yoshi
 int   invTimer;       // invencibilidade piscando (apos dano)
 int   starTimer;      // invencibilidade da ESTRELA (destroi tudo)
+int   starCombo;      // inimigos destruidos em sequencia na estrela
 float yoshiFleeX = -999;   // yoshi fugindo (apos dano); -999 = nenhum
 
 int   lives;
@@ -368,6 +369,7 @@ void resetGame() {
   riding     = false;
   invTimer   = 0;
   starTimer  = 0;
+  starCombo  = 0;
   yoshiFleeX = -999;
 
   lives      = 3;
@@ -404,6 +406,21 @@ void checkOneUp() {
     nextLifeAt += COINS_1UP;
     setBanner("1UP!");
   }
+}
+
+/* =====================================================================
+   ESTRELA — pontos em cascata (como no SNES: cada inimigo em sequencia
+   vale mais: 20 -> 40 -> 80 -> dai em diante 1UP por inimigo!)
+   ===================================================================== */
+void starKill() {
+  if      (starCombo == 0) score += 20;
+  else if (starCombo == 1) score += 40;
+  else if (starCombo == 2) score += 80;
+  else {
+    if (lives < MAX_LIVES) lives++;
+    setBanner("1UP!");
+  }
+  starCombo++;
 }
 
 /* =====================================================================
@@ -580,7 +597,7 @@ void updateWorld() {
       if (ext > 8) {
         int cx = (int)pipes[i].x + PIPE_W / 2;
         if (mR > cx - 8 && mL < cx + 8 && mB > pT - ext && mT < pT) {
-          if (star) { pipes[i].hasPlant = false; score += 20; }
+          if (star) { pipes[i].hasPlant = false; starKill(); }
           else takeHit();
         }
       }
@@ -622,7 +639,7 @@ void updateWorld() {
       if (star) {                                  // estrela destroi
         goombas[i].squash = 8;
         goombas[i].scored = true;
-        score += 20;
+        starKill();
       } else if (marioVel > 1.0f && mB < gT + 16) {  // pisao
         goombas[i].squash = 10;
         goombas[i].scored = true;
@@ -639,7 +656,11 @@ void updateWorld() {
 
     if (koopas[i].mode == 0)      koopas[i].x -= worldSpeed + 0.3f;
     else if (koopas[i].mode == 1) koopas[i].x -= worldSpeed;
-    else                          koopas[i].x += 7.5f - worldSpeed;
+    else {
+      float sv = 7.5f - worldSpeed;          // casco chutado dispara pra frente
+      if (sv < 2.0f) sv = 2.0f;              // (mesmo com o mundo em turbo)
+      koopas[i].x += sv;
+    }
 
     if (koopas[i].x < -45 || koopas[i].x > SCREEN_W + 20) {
       koopas[i].active = false;
@@ -685,7 +706,7 @@ void updateWorld() {
     if (mR > kL && mL < kR && mB > kT) {
       if (star) {                                  // estrela destroi
         koopas[i].active = false;
-        score += 20;
+        starKill();
       } else if (koopas[i].mode == 0) {
         if (marioVel > 1.0f && mB < kT + 16) {
           koopas[i].mode = 1;
@@ -720,7 +741,7 @@ void updateWorld() {
     if (mR > bL && mL < bR && mB > bT && mT < bB) {
       if (star) {
         bullets[i].active = false;
-        score += 20;
+        starKill();
       } else if (marioVel > 1.0f && mB < bT + 10) {   // da pra pisar nela!
         bullets[i].active = false;
         marioVel = JUMP_VEL * 0.75f;
@@ -806,7 +827,7 @@ void updateWorld() {
       items[i].active = false;
       score += 10;
       if      (kind == 1) superMario = true;
-      else if (kind == 2) { starTimer = 200; setBanner("ESTRELA!"); }
+      else if (kind == 2) { starTimer = 200; starCombo = 0; setBanner("ESTRELA!"); }
       else if (kind == 3 && !riding) { riding = true; setBanner("YOSHI!"); }
     }
   }
@@ -820,6 +841,7 @@ void updateWorld() {
   // ---- velocidade / mundo / parallax ----
   worldSpeed = 3.0f + passedCount * 0.1f;
   if (worldSpeed > 6.5f) worldSpeed = 6.5f;
+  if (starTimer > 0) worldSpeed *= 1.5f;   // ESTRELA = TURBO! (a "musica acelerada" do SNES)
 
   worldNum = 1 + score / WORLD_STEP;
   if (worldNum != lastWorldNum) {
