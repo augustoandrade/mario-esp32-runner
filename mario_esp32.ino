@@ -1140,6 +1140,17 @@ void drawHUD() {
 }
 
 /* =====================================================================
+   TEXTO CENTRALIZADO — calcula a largura e poe no meio da tela
+   (char tem 6px de largura no size 1, 12 no size 2, 18 no size 3)
+   ===================================================================== */
+void printCentered(const char *t, int y, int sz, uint16_t col) {
+  gfx->setTextColor(col);
+  gfx->setTextSize(sz);
+  gfx->setCursor(120 - (int)strlen(t) * 3 * sz, y);
+  gfx->print(t);
+}
+
+/* =====================================================================
    RELOGIO via Wi-Fi (opcional) — define o tema inicial pela hora real
    ===================================================================== */
 void syncThemeWithClock() {
@@ -1293,45 +1304,29 @@ void loop() {
   else if (state == STATE_READY) {
     int th = themeNow();
     uint16_t txt = (th == 1) ? C_DARK : C_WHITE;
-    gfx->setTextColor(txt);
-    gfx->setTextSize(3);
-    gfx->setCursor(75, 62);
-    gfx->print("MARIO");
-    gfx->setTextSize(2);
-    gfx->setCursor(84, 92);
-    gfx->print("RUNNER");
-    drawCoin(62, 70);
+    char buf[24];
+
+    printCentered("MARIO", 60, 3, txt);
+    printCentered("RUNNER", 90, 2, txt);
+    drawCoin(60, 70);                          // moedas simetricas ao titulo
     drawCoin(180, 70);
-    if ((frameTick / 16) % 2 == 0) {          // texto piscando
-      gfx->setTextSize(1);
-      gfx->setCursor(72, 120);
-      gfx->print("toque para jogar");
-    }
-    gfx->setTextSize(1);
-    gfx->setCursor(70, 136);
-    gfx->print("recorde: ");
-    gfx->print(bestScore);
+    if ((frameTick / 16) % 2 == 0)             // texto piscando
+      printCentered("toque para jogar", 120, 1, txt);
+    snprintf(buf, sizeof(buf), "recorde: %d", bestScore);
+    printCentered(buf, 136, 1, txt);
   }
   else { // STATE_OVER
-    gfx->setTextColor(C_WHITE);
-    gfx->setTextSize(2);
-    gfx->setCursor(38, 76);
-    gfx->print("GAME OVER");
-    gfx->setTextSize(1);
-    gfx->setCursor(80, 102);
-    gfx->print("pontos: ");
-    gfx->print(score);
-    gfx->setCursor(80, 114);
-    gfx->print("moedas: ");
-    gfx->print(coinCount);
-    gfx->setCursor(80, 126);
-    gfx->print("mundo: ");
-    gfx->print(worldNum);
-    gfx->setCursor(80, 138);
-    gfx->print("recorde: ");
-    gfx->print(bestScore);
-    gfx->setCursor(46, 154);
-    gfx->print("toque p/ tentar de novo");
+    char buf[24];
+    printCentered("GAME OVER", 76, 2, C_WHITE);
+    snprintf(buf, sizeof(buf), "pontos: %d", score);
+    printCentered(buf, 102, 1, C_WHITE);
+    snprintf(buf, sizeof(buf), "moedas: %d", coinCount);
+    printCentered(buf, 114, 1, C_WHITE);
+    snprintf(buf, sizeof(buf), "mundo: %d", worldNum);
+    printCentered(buf, 126, 1, C_WHITE);
+    snprintf(buf, sizeof(buf), "recorde: %d", bestScore);
+    printCentered(buf, 138, 1, C_WHITE);
+    printCentered("toque p/ tentar de novo", 154, 1, C_WHITE);
   }
 
   gfx->flush();
