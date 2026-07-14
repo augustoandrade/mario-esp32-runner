@@ -33,18 +33,32 @@ Se o upload falhar: segure **BOOT** ao conectar o USB e tente de novo.
 ## Como jogar
 
 - Tela inicial → toque para comecar
-- Toque em qualquer lugar da tela = **pular**
-- **Cano verde**: desvie pulando
+- **Pulo controlado**: toque curto = pulo baixinho; SEGURE = pulo alto
+- **Cano verde**: desvie pulando ou POUSE em cima (plataforma!)
+- **Planta carnivora**: sobe e desce de alguns canos — olhe antes de pousar!
 - **Goomba**: pule EM CIMA pra esmagar (+20 pts) ou desvie
 - **Koopa**: pise 1x → vira casco; encoste no casco → CHUTA! O casco
   sai na frente destruindo inimigos (+20 cada). Casco some ao bater em cano.
-- **Bloco "?"**: bata POR BAIXO (pulando) → solta moeda ou cogumelo
-- **Moedas**: colete no pulo ou correndo (+5 pts cada)
-- **Cogumelo**: vira Super Mario com capa — aguenta 1 batida
-  (perde a capa e pisca invencivel por um instante)
+- **Bala Bill**: voa baixo (pule!) ou alto (fique no chao que ela passa) —
+  tambem da pra pisar nela no ar!
+- **Bloco "?"**: bata POR BAIXO → moeda, cogumelo, ESTRELA ou OVO DO YOSHI
+- **Moedas**: +5 pts cada; a cada 30 moedas ganha **1UP** (vida extra)
+- **Cogumelo**: Super Mario com capa — aguenta 1 batida
+- **Estrela**: invencivel ~5s, cores piscando; destroi TUDO (ate canos!)
+- **Yoshi**: monta nele — pulo mais forte + aguenta 1 batida
+  (o Yoshi foge quando voce apanha, igualzinho ao SNES)
+- **Vidas**: 3 coracoes no HUD (max 5 com 1UPs)
 - **Mundos**: a cada 150 pts o cenario muda — dia → por do sol → noite
 - **Recorde**: salvo na flash, sobrevive ao desligar a placa
 - A velocidade aumenta conforme voce vence obstaculos
+
+## Opcional: tema pelo horario real
+
+Preencha `WIFI_SSID` / `WIFI_PASS` no topo do sketch (rede **2.4 GHz**).
+Ao ligar, a placa acerta o relogio pela internet e o jogo comeca com o
+cenario correspondente a hora (dia / por do sol / noite). O Wi-Fi e
+desligado logo em seguida (nao gasta memoria durante o jogo).
+Deixe `""` pra desativar (padrao).
 
 ## Detalhes tecnicos
 
@@ -60,9 +74,17 @@ Se o upload falhar: segure **BOOT** ao conectar o USB e tente de novo.
 - [x] Inimigo goomba (com pisao + esmagado)
 - [x] Power-up cogumelo -> capa (aguenta 1 hit)
 - [x] Parallax (nuvens/colinas/chao em velocidades diferentes)
-- [x] Bloco "?" pra bater por baixo (moeda ou cogumelo)
+- [x] Bloco "?" pra bater por baixo (moeda/cogumelo/estrela/yoshi)
 - [x] Koopa com casco chutavel
 - [x] Recorde salvo na flash (Preferences)
 - [x] Mundos com temas (dia / por do sol / noite)
-- [ ] Som (se houver buzzer)
+- [x] Pulo controlado pela duracao do toque
+- [x] Planta carnivora nos canos
+- [x] Bala Bill (baixa e alta)
+- [x] Estrela de invencibilidade
+- [x] Yoshi montavel (foge ao apanhar)
+- [x] Vidas (3 coracoes) + 1UP a cada 30 moedas
+- [x] Titulo animado
+- [x] Tema inicial pelo horario real (Wi-Fi/NTP opcional)
+- [ ] Som (precisa de buzzer externo)
 - [ ] Suporte a controle Bluetooth (BLE — ex.: Xbox firmware 5.15+)
