@@ -33,8 +33,13 @@ Se o upload falhar: segure **BOOT** ao conectar o USB e tente de novo.
 ## Como jogar
 
 - Tela inicial → toque para comecar
-- Toque em qualquer lugar da tela = pular
-- A velocidade aumenta conforme voce pontua
+- Toque em qualquer lugar da tela = **pular**
+- **Cano verde**: desvie pulando
+- **Goomba**: pule EM CIMA pra esmagar (+20 pts) ou desvie
+- **Moedas**: colete no pulo ou correndo (+5 pts cada)
+- **Cogumelo**: vira Super Mario com capa — aguenta 1 batida
+  (perde a capa e pisca invencivel por um instante)
+- A velocidade aumenta conforme voce vence obstaculos
 
 ## Detalhes tecnicos
 
@@ -46,8 +51,11 @@ Se o upload falhar: segure **BOOT** ao conectar o USB e tente de novo.
 
 ## Ideias / proximas versoes
 
-- [ ] Moedas girando (pontos extras)
+- [x] Moedas girando (pontos extras)
+- [x] Inimigo goomba (com pisao + esmagado)
+- [x] Power-up cogumelo -> capa (aguenta 1 hit)
+- [x] Parallax (nuvens/colinas/chao em velocidades diferentes)
+- [ ] Bloco "?" pra bater por baixo
 - [ ] Som (se houver buzzer)
-- [ ] Inimigo goomba
 - [ ] Recorde salvo na flash (Preferences)
 - [ ] Suporte a controle Bluetooth (BLE — ex.: Xbox firmware 5.15+)
