@@ -1,90 +1,112 @@
-# Mario Runner — ESP32-2432S012 (tela redonda)
+# 🍄 Mario Runner — ESP32 com tela redonda
 
-Mini-jogo estilo "dino do Chrome" com visual **Super Nintendo (Super Mario World)**:
-o Mario corre sozinho e voce **toca na tela pra pular** os canos verdes.
-Bateu no cano = game over; toque de novo pra recomecar.
+Um mini-jogo estilo *endless runner* (como o dinossauro do Chrome) com
+mecânicas de **Super Mario World**, rodando numa placa **ESP32-C3 com tela
+redonda de 1.28"** e controlado 100% pelo **touch**.
 
-![placa](https://img.shields.io) <!-- coloque uma foto da tela aqui se quiser -->
+Feito em um único sketch Arduino, sem imagens externas: todos os
+personagens são **pixel art desenhada em código** (matrizes + paleta RGB565).
 
-## Hardware
+> 📸 *[adicione aqui uma foto ou GIF da placa rodando o jogo]*
 
-Placa **ESP32-2432S012** (JCZN / JC ESP32-2424S012) — tudo-em-um (MCU + tela + touch).
+## 🎮 Como se joga
+
+| Ação | Como |
+|------|------|
+| Pular | Toque na tela — **toque curto** = pulo baixo, **segurar** = pulo alto |
+| Cano verde | Desvie pulando ou **pouse em cima** (é plataforma!) |
+| 🌱 Planta carnívora | Sobe e desce de alguns canos — olhe antes de pousar |
+| 🍄 Goomba | Pise em cima pra esmagar (+20) |
+| 🐢 Koopa | Pise 1x → vira casco; encoste no casco → **chute!** O casco destrói os inimigos à frente |
+| 🚀 Bala Bill | Baixa = pule; alta = fique no chão (ou pise nela no ar!) |
+| ❓ Bloco "?" | Bata **por baixo** → moeda, cogumelo, estrela ou ovo do Yoshi |
+| 🪙 Moedas | +5 pts; a cada 30 moedas = **1UP** |
+| 🍄 Cogumelo | Vira Super Mario com capa (aguenta 1 batida) |
+| ⭐ Estrela | ~5s invencível — destrói TUDO, até canos |
+| 🦖 Yoshi | Monte nele: pulo mais forte + proteção extra (ele foge quando você apanha, como no SNES) |
+
+- **3 vidas** (corações no HUD), máximo 5 com 1UPs
+- **Mundos**: a cada 150 pts o cenário muda — dia → pôr do sol → noite
+- **Recorde salvo na flash** — sobrevive ao desligar
+- A velocidade aumenta conforme você avança
+
+## 🔩 Hardware
+
+Placa **ESP32-2432S012** (também vendida como *JC ESP32-2424S012*) —
+tudo-em-um, sem nenhuma solda ou fiação:
 
 | Item  | Detalhe |
 |-------|---------|
-| MCU   | ESP32-C3-MINI-1U (RISC-V, 1 nucleo) |
-| RAM   | ~400 KB SRAM · **sem PSRAM** |
-| Tela  | 1.28" redonda IPS 240x240, driver **GC9A01** (SPI) |
-| Touch | **CST816** capacitivo (I2C, 0x15) |
-| Radio | Wi-Fi 2.4 GHz + **Bluetooth LE** (sem Bluetooth Classic) |
+| MCU   | ESP32-C3-MINI-1U (RISC-V, 1 núcleo, 160 MHz) |
+| RAM   | ~400 KB SRAM (sem PSRAM) |
+| Flash | 4 MB |
+| Tela  | 1.28" redonda IPS 240×240 — driver **GC9A01** (SPI) |
+| Touch | **CST816** capacitivo (I2C, endereço 0x15) |
+| Rádio | Wi-Fi 2.4 GHz + Bluetooth LE |
 
-## Como compilar (Arduino IDE 2.x)
+<details>
+<summary>Pinagem interna da placa (já soldada)</summary>
 
-**Ferramentas (Tools):**
-- Board: `ESP32C3 Dev Module`
-- USB CDC On Boot: `Enabled`
-- Partition Scheme: `Huge APP (3MB No OTA/1MB SPIFFS)`
+| Sinal | GPIO |
+|-------|------|
+| TFT SCK | 6 |
+| TFT MOSI | 7 |
+| TFT DC | 2 |
+| TFT CS | 10 |
+| TFT RST | -1 (interno) |
+| Backlight | 3 (HIGH = ligado) |
+| Touch SDA | 4 |
+| Touch SCL | 5 |
 
-**Biblioteca (Library Manager):**
-- GFX Library for Arduino (moononournation)
+</details>
 
-Se o upload falhar: segure **BOOT** ao conectar o USB e tente de novo.
+## 🛠️ Como compilar (Arduino IDE 2.x)
 
-## Como jogar
+1. Instale o suporte a ESP32: **Settings → Additional boards manager URLs** →
+   `https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json`
+   e instale **esp32 (Espressif)** no Boards Manager.
+2. Instale a biblioteca **GFX Library for Arduino** (moononournation) no
+   Library Manager.
+3. Configure em **Tools**:
+   - Board: `ESP32C3 Dev Module`
+   - USB CDC On Boot: `Enabled`
+   - Partition Scheme: `Huge APP (3MB No OTA/1MB SPIFFS)`
+4. Abra `mario_esp32.ino` e clique em **Upload**.
 
-- Tela inicial → toque para comecar
-- **Pulo controlado**: toque curto = pulo baixinho; SEGURE = pulo alto
-- **Cano verde**: desvie pulando ou POUSE em cima (plataforma!)
-- **Planta carnivora**: sobe e desce de alguns canos — olhe antes de pousar!
-- **Goomba**: pule EM CIMA pra esmagar (+20 pts) ou desvie
-- **Koopa**: pise 1x → vira casco; encoste no casco → CHUTA! O casco
-  sai na frente destruindo inimigos (+20 cada). Casco some ao bater em cano.
-- **Bala Bill**: voa baixo (pule!) ou alto (fique no chao que ela passa) —
-  tambem da pra pisar nela no ar!
-- **Bloco "?"**: bata POR BAIXO → moeda, cogumelo, ESTRELA ou OVO DO YOSHI
-- **Moedas**: +5 pts cada; a cada 30 moedas ganha **1UP** (vida extra)
-- **Cogumelo**: Super Mario com capa — aguenta 1 batida
-- **Estrela**: invencivel ~5s, cores piscando; destroi TUDO (ate canos!)
-- **Yoshi**: monta nele — pulo mais forte + aguenta 1 batida
-  (o Yoshi foge quando voce apanha, igualzinho ao SNES)
-- **Vidas**: 3 coracoes no HUD (max 5 com 1UPs)
-- **Mundos**: a cada 150 pts o cenario muda — dia → por do sol → noite
-- **Recorde**: salvo na flash, sobrevive ao desligar a placa
-- A velocidade aumenta conforme voce vence obstaculos
+> 💡 Se o upload falhar, segure o botão **BOOT** da placa ao conectar o
+> USB e tente de novo.
 
-## Opcional: tema pelo horario real
+### Opcional: cenário pelo horário real
 
 Preencha `WIFI_SSID` / `WIFI_PASS` no topo do sketch (rede **2.4 GHz**).
-Ao ligar, a placa acerta o relogio pela internet e o jogo comeca com o
-cenario correspondente a hora (dia / por do sol / noite). O Wi-Fi e
-desligado logo em seguida (nao gasta memoria durante o jogo).
-Deixe `""` pra desativar (padrao).
+Ao ligar, a placa acerta o relógio pela internet e o jogo começa com o
+cenário da hora atual (dia / pôr do sol / noite). O Wi-Fi é desligado em
+seguida — não gasta memória durante o jogo. Deixe `""` pra desativar.
 
-## Detalhes tecnicos
+## ⚙️ Como funciona por dentro
 
-- Sem GIF / sem Wi-Fi: Mario e canos desenhados na hora.
-- Mario e um **sprite de pixel art 16x16** (matriz + paleta), ampliado 2x.
-- **Arduino_Canvas** 240x240: desenha o quadro na RAM e envia de uma vez
-  (`flush()`) -> sem flicker (~40 fps).
-- Touch por **polling** do CST816.
+- **Sem flicker**: o quadro inteiro é desenhado num `Arduino_Canvas`
+  (framebuffer de 240×240 na RAM, ~115 KB) e enviado de uma vez com
+  `flush()` — roda a ~40 fps.
+- **Sprites**: Mario, Goomba, Koopa, Yoshi e cogumelo são matrizes de
+  pixel art (ex.: 16×16) com paleta RGB565, desenhadas ampliadas 2×.
+- **Touch por polling**: o CST816 é lido a cada quadro via I2C
+  (6 bytes a partir do registrador 0x01) — sem pino de interrupção.
+- **Parallax**: nuvens (12%), colinas (30%) e chão (100%) rolam em
+  velocidades diferentes.
+- **Recorde**: gravado na NVS via `Preferences`, apenas quando melhora
+  (pra poupar a flash).
 
-## Ideias / proximas versoes
+## 🗺️ Ideias futuras
 
-- [x] Moedas girando (pontos extras)
-- [x] Inimigo goomba (com pisao + esmagado)
-- [x] Power-up cogumelo -> capa (aguenta 1 hit)
-- [x] Parallax (nuvens/colinas/chao em velocidades diferentes)
-- [x] Bloco "?" pra bater por baixo (moeda/cogumelo/estrela/yoshi)
-- [x] Koopa com casco chutavel
-- [x] Recorde salvo na flash (Preferences)
-- [x] Mundos com temas (dia / por do sol / noite)
-- [x] Pulo controlado pela duracao do toque
-- [x] Planta carnivora nos canos
-- [x] Bala Bill (baixa e alta)
-- [x] Estrela de invencibilidade
-- [x] Yoshi montavel (foge ao apanhar)
-- [x] Vidas (3 coracoes) + 1UP a cada 30 moedas
-- [x] Titulo animado
-- [x] Tema inicial pelo horario real (Wi-Fi/NTP opcional)
-- [ ] Som (precisa de buzzer externo)
-- [ ] Suporte a controle Bluetooth (BLE — ex.: Xbox firmware 5.15+)
+- [ ] Som (precisa de buzzer externo num GPIO livre)
+- [ ] Suporte a controle Bluetooth (BLE — ex.: Xbox firmware 5.15+, via Bluepad32)
+
+## 📜 Licença e créditos
+
+Código sob licença [MIT](LICENSE). Este é um projeto de estudo/hobby,
+feito do zero — **não** usa assets da Nintendo. Mario, Yoshi e Super
+Mario World são marcas da Nintendo; este projeto não é afiliado nem
+endossado por ela.
+
+Desenvolvido com ajuda do [Claude Code](https://claude.com/claude-code). 🤖
