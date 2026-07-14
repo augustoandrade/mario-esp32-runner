@@ -1143,6 +1143,8 @@ void setup() {
   pinMode(BTN_JUMP, INPUT_PULLUP);   // botao BOOT / simulador
 
   gfx->begin();
+  gfx->setTextWrap(false);   // sem quebra de linha: texto fora da tela e cortado,
+                             // nao "pula" pro lado esquerdo (bug do ? fantasma)
   gfx->fillScreen(C_BLACK);
   if (strlen(WIFI_SSID) > 0) {
     gfx->setTextColor(C_WHITE);
