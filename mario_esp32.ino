@@ -93,7 +93,9 @@ struct Pipe   { float x; int h; bool active; bool scored; bool hasPlant; int pla
 struct Goomba { float x; bool active; bool scored; int squash; };
 struct Koopa  { float x; bool active; bool scored; int mode; };   // 0 anda, 1 casco, 2 casco chutado
 struct Coin   { float x; int y; bool active; };
-struct Item   { float x; float y; float vy; bool active; int kind; };  // 1 cogumelo, 2 estrela, 3 ovo yoshi
+struct Item   { float x; float y; float vy; bool active; int kind; bool fw; };
+// kind: 1 cogumelo, 2 estrela, 3 ovo yoshi
+// fw: true = voando pra FRENTE (recem-saido do bloco); false = no chao, vem com o mundo
 struct QBlock { float x; bool active; bool used; int bump; int coinPop; };
 struct Bullet { float x; int y; bool active; bool scored; };
 
@@ -492,10 +494,10 @@ void spawnQBlock() {
     }
 }
 
-bool spawnItem(int kind, float x, float y, float vy) {
+bool spawnItem(int kind, float x, float y, float vy, bool fw) {
   for (int i = 0; i < MAX_ITEMS; i++)
     if (!items[i].active) {
-      items[i] = { x, y, vy, true, kind };
+      items[i] = { x, y, vy, true, kind, fw };
       return true;
     }
   return false;
@@ -527,7 +529,7 @@ void updateWorld() {
     else                                   spawnPipe();
 
     if (!superMario && starTimer == 0 && random(0, 100) < 8)
-      spawnItem(1, SCREEN_W + 40, GROUND_Y - SHR_H, 0);  // cogumelo avulso deslizando no chao
+      spawnItem(1, SCREEN_W + 40, GROUND_Y - SHR_H, 0, false);  // cogumelo avulso no chao
 
     distSinceLast = 0;
     nextGap = random(115, 185);
@@ -740,12 +742,13 @@ void updateWorld() {
         marioVel = 0.5f;
 
         // premio: ovo do Yoshi > estrela > cogumelo > moeda
-        // o item PULA do bloco e cai no chao (como no SNES)
+        // o item PULA do bloco pra FRENTE, cai no chao a frente do Mario
+        // e volta na direcao dele com o mundo (adaptacao do SNES pro runner)
         int roll = random(0, 100);
         bool given = false;
-        if      (roll < 15 && !riding)          given = spawnItem(3, qblocks[i].x, QB_Y - 24, -3.5f);
-        else if (roll < 28 && starTimer == 0)   given = spawnItem(2, qblocks[i].x, QB_Y - 24, -3.5f);
-        else if (roll < 55 && !superMario)      given = spawnItem(1, qblocks[i].x, QB_Y - 24, -3.5f);
+        if      (roll < 15 && !riding)          given = spawnItem(3, qblocks[i].x, QB_Y - 24, -3.5f, true);
+        else if (roll < 28 && starTimer == 0)   given = spawnItem(2, qblocks[i].x, QB_Y - 24, -3.5f, true);
+        else if (roll < 55 && !superMario)      given = spawnItem(1, qblocks[i].x, QB_Y - 24, -3.5f, true);
         if (!given) {
           qblocks[i].coinPop = 12;
           coinCount++;
@@ -775,18 +778,21 @@ void updateWorld() {
   for (int i = 0; i < MAX_ITEMS; i++) {
     if (!items[i].active) continue;
 
-    // cogumelo/ovo deslizam na direcao do Mario; estrela vem mais devagar
-    items[i].x -= worldSpeed + ((items[i].kind == 2) ? 0.3f : 0.6f);
+    // saiu do bloco: voa em ARCO pra frente; depois de tocar o chao,
+    // vem com o mundo na direcao do Mario (da tempo de pegar!)
+    if (items[i].fw) items[i].x += 2.4f;
+    else             items[i].x -= worldSpeed;
 
     // gravidade + chao
     items[i].vy += 0.5f;
     items[i].y  += items[i].vy;
     if (items[i].y + SHR_H >= GROUND_Y) {
-      items[i].y = GROUND_Y - SHR_H;
+      items[i].y  = GROUND_Y - SHR_H;
+      items[i].fw = false;                              // aterrissou
       items[i].vy = (items[i].kind == 2) ? -6.5f : 0;   // estrela QUICA!
     }
 
-    if (items[i].x < -30) { items[i].active = false; continue; }
+    if (items[i].x < -30 || items[i].x > SCREEN_W + 40) { items[i].active = false; continue; }
 
     int sy = (int)items[i].y;
     if (mR > items[i].x && mL < items[i].x + SHR_W && mB > sy && mT < sy + SHR_H) {
